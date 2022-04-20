@@ -212,8 +212,6 @@ class MersenneTwisterEngine {
     _state[0] = BigInt.one << (w - 1);
   }
 
-  late final _mag01 = [BigInt.zero, a];
-
   /// Returns the next random number.
   BigInt call() {
     // Generate [n] words at one time.
@@ -225,14 +223,14 @@ class MersenneTwisterEngine {
       int i;
       for (i = 0; i < n - m; i += 1) {
         var x = (_state[i] & _upperMask) | (_state[i + 1] & _lowerMask);
-        _state[i] = _state[i + m] ^ (x >> 1) ^ _mag01[x.isEven ? 0 : 1];
+        _state[i] = _state[i + m] ^ (x >> 1) ^ ((x & BigInt.one) * a);
       }
       for (; i < n - 1; i += 1) {
         var x = (_state[i] & _upperMask) | (_state[i + 1] & _lowerMask);
-        _state[i] = _state[i + m - n] ^ (x >> 1) ^ _mag01[x.isEven ? 0 : 1];
+        _state[i] = _state[i + m - n] ^ (x >> 1) ^ ((x & BigInt.one) * a);
       }
       var x = (_state[n - 1] & _upperMask) | (_state[0] & _lowerMask);
-      _state[n - 1] = _state[m - 1] ^ (x >> 1) ^ _mag01[x.isEven ? 0 : 1];
+      _state[n - 1] = _state[m - 1] ^ (x >> 1) ^ ((x & BigInt.one) * a);
 
       _stateIndex = 0;
     }

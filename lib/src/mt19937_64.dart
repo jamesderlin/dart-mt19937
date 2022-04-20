@@ -154,21 +154,19 @@ class MersenneTwister64 {
 
   /// Returns the next random number.
   BigInt call() {
-    const mag01 = [0, a];
-
     // Generate [n] words at one time.
     if (_stateIndex == n) {
       int i;
       for (i = 0; i < n - m; i += 1) {
         var x = (_state[i] & _upperMask) | (_state[i + 1] & _lowerMask);
-        _state[i] = _state[i + m] ^ (x >>> 1) ^ mag01[x & 0x1];
+        _state[i] = _state[i + m] ^ (x >>> 1) ^ ((x & 0x1) * a);
       }
       for (; i < n - 1; i += 1) {
         var x = (_state[i] & _upperMask) | (_state[i + 1] & _lowerMask);
-        _state[i] = _state[i + m - n] ^ (x >>> 1) ^ mag01[x & 0x1];
+        _state[i] = _state[i + m - n] ^ (x >>> 1) ^ ((x & 0x1) * a);
       }
       var x = (_state[n - 1] & _upperMask) | (_state[0] & _lowerMask);
-      _state[n - 1] = _state[m - 1] ^ (x >>> 1) ^ mag01[x & 0x1];
+      _state[n - 1] = _state[m - 1] ^ (x >>> 1) ^ ((x & 0x1) * a);
 
       _stateIndex = 0;
     }
