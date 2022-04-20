@@ -6,6 +6,9 @@ repository: https://github.com/jamesderlin/dart_mt19937
 environment:
   sdk: '>=2.15.0 <3.0.0'
 
+dependencies:
+  fixnum: ^1.0.0
+
 dev_dependencies:
   build_runner: ^2.1.4
   build_web_compilers: ^3.2.1

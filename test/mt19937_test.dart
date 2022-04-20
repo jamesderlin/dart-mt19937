@@ -3,8 +3,11 @@
 import 'dart:convert';
 import 'dart:io' as io;
 
+import 'package:fixnum/fixnum.dart';
 import 'package:mt19937/src/mt19937.dart';
 import 'package:mt19937/src/mt19937_64.dart';
+import 'package:mt19937/src/mt19937_64_fixnum.dart' as mtfn;
+import 'package:mt19937/src/mt19937_fixnum.dart' as mtfn;
 import 'package:mt19937/src/mt19937_general.dart';
 import 'package:test/test.dart';
 
@@ -69,6 +72,50 @@ Future<void> main() async {
           mt.call,
           'reference/expected_mt19937_64_max_seed.txt',
           BigInt.parse,
+        );
+      });
+    });
+  });
+
+  group('fixnum implementation:', () {
+    group('mt19937:', () {
+      test('default seed', () async {
+        var mt = mtfn.MersenneTwister();
+        await _compareReferenceOutput(
+          mt.call,
+          'reference/expected_mt19937_default.txt',
+          Int32.parseInt,
+        );
+      });
+
+      test('max seed', () async {
+        var seed = Int32(-1);
+        var mt = mtfn.MersenneTwister(seed: seed);
+        await _compareReferenceOutput(
+          mt.call,
+          'reference/expected_mt19937_max_seed.txt',
+          Int32.parseInt,
+        );
+      });
+    });
+
+    group('mt19937-64:', () {
+      test('default seed', () async {
+        var mt = mtfn.MersenneTwister64();
+        await _compareReferenceOutput(
+          mt.call,
+          'reference/expected_mt19937_64_default.txt',
+          Int64.parseInt,
+        );
+      });
+
+      test('max seed', () async {
+        var seed = Int64(-1);
+        var mt = mtfn.MersenneTwister64(seed: seed);
+        await _compareReferenceOutput(
+          mt.call,
+          'reference/expected_mt19937_64_max_seed.txt',
+          Int64.parseInt,
         );
       });
     });
