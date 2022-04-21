@@ -4,9 +4,9 @@ import 'dart:convert';
 import 'dart:io' as io;
 
 import 'package:fixnum/fixnum.dart';
-import 'package:mt19937/src/mt19937.dart';
 import 'package:mt19937/src/mt19937_engine.dart';
 import 'package:mt19937/src/mt19937_fixnum.dart' as mtfn;
+import 'package:mt19937/src/mt19937_vm.dart';
 import 'package:test/test.dart';
 
 /// Returns the absolute path to this `.dart` file.
