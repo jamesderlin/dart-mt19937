@@ -15,3 +15,15 @@ extension UnsignedInt64 on Int64 {
   /// two's-complement bit representation.
   BigInt toUnsignedBigInt() => BigInt.parse(toStringUnsigned());
 }
+
+// ignore: public_member_api_docs
+extension UnsignedRightShift32 on Int32 {
+  // ignore: public_member_api_docs
+  Int32 operator >>>(int n) => shiftRightUnsigned(n);
+}
+
+// ignore: public_member_api_docs
+extension UnsignedRightShift64 on Int64 {
+  // ignore: public_member_api_docs
+  Int64 operator >>>(int n) => shiftRightUnsigned(n);
+}

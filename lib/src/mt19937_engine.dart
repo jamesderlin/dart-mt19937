@@ -174,7 +174,7 @@ class MersenneTwisterEngine {
       // See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier.
       _state[_stateIndex] = f *
               (_state[_stateIndex - 1] ^
-                  (_state[_stateIndex - 1].shiftRightUnsigned(w - 2))) +
+                  (_state[_stateIndex - 1] >>> (w - 2))) +
           Int64(_stateIndex);
       _state[_stateIndex] &= _wordMask;
     }
@@ -187,11 +187,10 @@ class MersenneTwisterEngine {
     var i = 1;
     var j = 0;
     for (var k = n > key.length ? n : key.length; k != 0; k -= 1) {
-      _state[i] = (_state[i] ^
-              ((_state[i - 1] ^ (_state[i - 1].shiftRightUnsigned(w - 2))) *
-                  f1)) +
-          key[j] +
-          Int64(j); // Non-linear.
+      _state[i] =
+          (_state[i] ^ ((_state[i - 1] ^ (_state[i - 1] >>> (w - 2))) * f1)) +
+              key[j] +
+              Int64(j); // Non-linear.
       _state[i] &= _wordMask;
       i += 1;
       j += 1;
@@ -204,10 +203,9 @@ class MersenneTwisterEngine {
       }
     }
     for (var k = n - 1; k != 0; k -= 1) {
-      _state[i] = (_state[i] ^
-              ((_state[i - 1] ^ (_state[i - 1].shiftRightUnsigned(w - 2))) *
-                  f2)) -
-          Int64(i); // Non-linear.
+      _state[i] =
+          (_state[i] ^ ((_state[i - 1] ^ (_state[i - 1] >>> (w - 2))) * f2)) -
+              Int64(i); // Non-linear.
       _state[i] &= _wordMask;
       i += 1;
       if (i >= n) {
@@ -242,18 +240,14 @@ class MersenneTwisterEngine {
       int i;
       for (i = 0; i < n - m; i += 1) {
         var x = (_state[i] & _upperMask) | (_state[i + 1] & _lowerMask);
-        _state[i] =
-            _state[i + m] ^ (x.shiftRightUnsigned(1)) ^ ((x & Int64.ONE) * a);
+        _state[i] = _state[i + m] ^ (x >>> 1) ^ ((x & Int64.ONE) * a);
       }
       for (; i < n - 1; i += 1) {
         var x = (_state[i] & _upperMask) | (_state[i + 1] & _lowerMask);
-        _state[i] = _state[i + m - n] ^
-            (x.shiftRightUnsigned(1)) ^
-            ((x & Int64.ONE) * a);
+        _state[i] = _state[i + m - n] ^ (x >>> 1) ^ ((x & Int64.ONE) * a);
       }
       var x = (_state[n - 1] & _upperMask) | (_state[0] & _lowerMask);
-      _state[n - 1] =
-          _state[m - 1] ^ (x.shiftRightUnsigned(1)) ^ ((x & Int64.ONE) * a);
+      _state[n - 1] = _state[m - 1] ^ (x >>> 1) ^ ((x & Int64.ONE) * a);
 
       _stateIndex = 0;
     }
@@ -262,10 +256,10 @@ class MersenneTwisterEngine {
     _stateIndex += 1;
 
     // Tempering.
-    x ^= (x.shiftRightUnsigned(u)) & d;
+    x ^= (x >>> u) & d;
     x ^= (x << s) & b;
     x ^= (x << t) & c;
-    x ^= x.shiftRightUnsigned(l);
+    x ^= x >>> l;
     return x;
   }
 }

@@ -111,7 +111,7 @@ class MersenneTwister {
       // See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier.
       _state[_stateIndex] = _f *
               (_state[_stateIndex - 1] ^
-                  (_state[_stateIndex - 1].shiftRightUnsigned(_w - 2))) +
+                  (_state[_stateIndex - 1] >>> (_w - 2))) +
           _stateIndex as Int32;
       _state[_stateIndex] &= _wordMask;
     }
@@ -124,9 +124,7 @@ class MersenneTwister {
     var j = 0;
     for (var k = _n > key.length ? _n : key.length; k != 0; k -= 1) {
       mt._state[i] = (mt._state[i] ^
-              ((mt._state[i - 1] ^
-                      (mt._state[i - 1].shiftRightUnsigned(_w - 2))) *
-                  _f1)) +
+              ((mt._state[i - 1] ^ (mt._state[i - 1] >>> (_w - 2))) * _f1)) +
           key[j] +
           j as Int32; // Non-linear.
       mt._state[i] &= _wordMask;
@@ -142,9 +140,7 @@ class MersenneTwister {
     }
     for (var k = _n - 1; k != 0; k -= 1) {
       mt._state[i] = (mt._state[i] ^
-              ((mt._state[i - 1] ^
-                      (mt._state[i - 1].shiftRightUnsigned(_w - 2))) *
-                  _f2)) -
+              ((mt._state[i - 1] ^ (mt._state[i - 1] >>> (_w - 2))) * _f2)) -
           i as Int32; // Non-linear.
       mt._state[i] &= _wordMask;
       i += 1;
@@ -166,16 +162,14 @@ class MersenneTwister {
       int i;
       for (i = 0; i < _n - _m; i += 1) {
         var x = (_state[i] & _upperMask) | (_state[i + 1] & _lowerMask);
-        _state[i] = _state[i + _m] ^ x.shiftRightUnsigned(1) ^ ((x & 0x1) * _a);
+        _state[i] = _state[i + _m] ^ (x >>> 1) ^ ((x & 0x1) * _a);
       }
       for (; i < _n - 1; i += 1) {
         var x = (_state[i] & _upperMask) | (_state[i + 1] & _lowerMask);
-        _state[i] =
-            _state[i + _m - _n] ^ x.shiftRightUnsigned(1) ^ ((x & 0x1) * _a);
+        _state[i] = _state[i + _m - _n] ^ (x >>> 1) ^ ((x & 0x1) * _a);
       }
       var x = (_state[_n - 1] & _upperMask) | (_state[0] & _lowerMask);
-      _state[_n - 1] =
-          _state[_m - 1] ^ x.shiftRightUnsigned(1) ^ ((x & 0x1) * _a);
+      _state[_n - 1] = _state[_m - 1] ^ (x >>> 1) ^ ((x & 0x1) * _a);
 
       _stateIndex = 0;
     }
@@ -184,10 +178,10 @@ class MersenneTwister {
     _stateIndex += 1;
 
     // Tempering.
-    x ^= x.shiftRightUnsigned(_u) & _d;
+    x ^= (x >>> _u) & _d;
     x ^= (x << _s) & _b;
     x ^= (x << _t) & _c;
-    x ^= x.shiftRightUnsigned(_l);
+    x ^= x >>> _l;
     return x.toInt().toUint32();
   }
 }
