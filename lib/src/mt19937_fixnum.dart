@@ -34,10 +34,10 @@ import 'package:fixnum/fixnum.dart';
 
 import 'unsigned.dart';
 
-/// An implementation of Mersenne Twister 19937.
+/// An implementation of the [Mersenne Twister 19937][1] pseudo-random number
+/// generator.
 ///
-/// This implementation is portable for both the Dart VM and for Dart for the
-/// Web.
+/// [1]: https://en.wikipedia.org/wiki/Mersenne_twister
 class MersenneTwister {
   /// Word size.
   static const _w = 32;
@@ -105,8 +105,8 @@ class MersenneTwister {
   int _stateIndex = _n;
 
   /// Initializes the random number generator from an optional seed.
-  MersenneTwister({int seed = defaultSeed}) {
-    _state[0] = Int32(seed) & _wordMask;
+  MersenneTwister({int? seed}) {
+    _state[0] = Int32(seed ?? defaultSeed) & _wordMask;
     for (_stateIndex = 1; _stateIndex < _n; _stateIndex += 1) {
       // See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier.
       _state[_stateIndex] = _f *
