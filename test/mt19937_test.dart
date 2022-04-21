@@ -37,7 +37,7 @@ Future<void> main() async {
         var mt = MersenneTwister();
         await _compareReferenceOutput(
           () => BigInt.from(mt()),
-          'reference/expected_mt19937_default.txt',
+          'reference/mt19937/default.txt',
           BigInt.parse,
         );
       });
@@ -47,7 +47,7 @@ Future<void> main() async {
         var mt = MersenneTwister(seed: seed);
         await _compareReferenceOutput(
           () => BigInt.from(mt()),
-          'reference/expected_mt19937_max_seed.txt',
+          'reference/mt19937/max_seed.txt',
           BigInt.parse,
         );
       });
@@ -58,7 +58,7 @@ Future<void> main() async {
         var mt = mtfn.MersenneTwister();
         await _compareReferenceOutput(
           () => BigInt.from(mt()),
-          'reference/expected_mt19937_default.txt',
+          'reference/mt19937/default.txt',
           BigInt.parse,
         );
       });
@@ -68,7 +68,7 @@ Future<void> main() async {
         var mt = mtfn.MersenneTwister(seed: seed);
         await _compareReferenceOutput(
           () => BigInt.from(mt()),
-          'reference/expected_mt19937_max_seed.txt',
+          'reference/mt19937/max_seed.txt',
           BigInt.parse,
         );
       });
@@ -81,7 +81,7 @@ Future<void> main() async {
         var mt = MersenneTwisterEngine.w32();
         await _compareReferenceOutput(
           mt.call,
-          'reference/expected_mt19937_default.txt',
+          'reference/mt19937/default.txt',
           BigInt.parse,
         );
       });
@@ -91,7 +91,7 @@ Future<void> main() async {
         var mt = MersenneTwisterEngine.w32()..init(seed.toInt64());
         await _compareReferenceOutput(
           mt.call,
-          'reference/expected_mt19937_max_seed.txt',
+          'reference/mt19937/max_seed.txt',
           BigInt.parse,
         );
       });
@@ -102,7 +102,7 @@ Future<void> main() async {
         var mt = MersenneTwisterEngine.w64();
         await _compareReferenceOutput(
           mt.call,
-          'reference/expected_mt19937_64_default.txt',
+          'reference/mt19937-64/default.txt',
           BigInt.parse,
         );
       });
@@ -112,7 +112,7 @@ Future<void> main() async {
         var mt = MersenneTwisterEngine.w64()..init(seed);
         await _compareReferenceOutput(
           mt.call,
-          'reference/expected_mt19937_64_max_seed.txt',
+          'reference/mt19937-64/max_seed.txt',
           BigInt.parse,
         );
       });
