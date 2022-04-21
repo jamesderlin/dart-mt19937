@@ -1,19 +1,21 @@
 import 'package:fixnum/fixnum.dart';
 
 // ignore: public_member_api_docs
-extension UnsignedInt on int {
-  /// Returns the unsigned 32-bit integer that corresponds to this [int]'s
-  /// two's-complement bit representation.
-  int toUint32() {
-    return this >= 0 ? this : (this + 0xFFFFFFFF + 1);
-  }
-}
-
-// ignore: public_member_api_docs
 extension UnsignedInt64 on Int64 {
   /// Returns the unsigned 64-bit integer that corresponds to this [Int64]'s
   /// two's-complement bit representation.
-  BigInt toUnsignedBigInt() => BigInt.parse(toStringUnsigned());
+  BigInt toUnsignedBigInt() {
+    // Multiple implementations were considered:
+    //
+    // 1. `BigInt.parse(toStringUnsigned())`.
+    // 2. Building a `BigInt` from each element of `toBytes()`.
+    //
+    // The current implementation empirically seems ~4x faster than approach
+    // #1 and ~2x faster than approach #2 when compiled to native.
+    var lower = this & Int64(0xFFFFFFFF);
+    var upper = this >>> 32;
+    return BigInt.from(lower.toInt()) | (BigInt.from(upper.toInt()) << 32);
+  }
 }
 
 // ignore: public_member_api_docs

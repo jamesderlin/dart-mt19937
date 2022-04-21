@@ -182,6 +182,6 @@ class MersenneTwister {
     x ^= (x << _s) & _b;
     x ^= (x << _t) & _c;
     x ^= x >>> _l;
-    return x.toInt().toUint32();
+    return x.toInt().toUnsigned(32);
   }
 }

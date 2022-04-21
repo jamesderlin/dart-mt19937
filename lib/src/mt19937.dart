@@ -32,8 +32,6 @@
 
 import 'dart:typed_data';
 
-import 'unsigned.dart';
-
 /// An implementation of Mersenne Twister 19937.
 ///
 /// This implementation should be used only for the Dart VM, not for Dart for
@@ -182,6 +180,6 @@ class MersenneTwister {
     x ^= (x << _s) & _b;
     x ^= (x << _t) & _c;
     x ^= x >>> _l;
-    return x.toUint32();
+    return x.toUnsigned(32);
   }
 }
