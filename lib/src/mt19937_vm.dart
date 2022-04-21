@@ -32,6 +32,8 @@
 
 import 'dart:typed_data';
 
+import 'mt19937_fixnum.dart' as base;
+
 /// An implementation of the [Mersenne Twister 19937][1] pseudo-random number
 /// generator.
 ///
@@ -39,7 +41,7 @@ import 'dart:typed_data';
 /// the Web.
 ///
 /// [1]: https://en.wikipedia.org/wiki/Mersenne_twister
-class MersenneTwister {
+class MersenneTwister implements base.MersenneTwister {
   /// Word size.
   static const _w = 32;
 
@@ -157,6 +159,7 @@ class MersenneTwister {
   }
 
   /// Returns the next random number in the range [0, max].
+  @override
   int call() {
     // Generate [n] words at one time.
     if (_stateIndex == _n) {
