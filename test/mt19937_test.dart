@@ -31,6 +31,9 @@ Future<void> main() async {
     io.Directory.current = io.File(scriptPath).parent.parent;
   }
 
+  const sequence = [0x123, 0x234, 0x345, 0x456];
+  const sequence64 = [0x12345, 0x23456, 0x34567, 0x45678];
+
   group('mt19937:', () {
     group('VM implementation:', () {
       test('default seed', () async {
@@ -48,6 +51,15 @@ Future<void> main() async {
         await _compareReferenceOutput(
           () => BigInt.from(mt()),
           'reference/mt19937/max_seed.txt',
+          BigInt.parse,
+        );
+      });
+
+      test('sequence', () async {
+        var mt = MersenneTwister.from(sequence);
+        await _compareReferenceOutput(
+          () => BigInt.from(mt()),
+          'reference/mt19937/sequence.txt',
           BigInt.parse,
         );
       });
@@ -69,6 +81,15 @@ Future<void> main() async {
         await _compareReferenceOutput(
           () => BigInt.from(mt()),
           'reference/mt19937/max_seed.txt',
+          BigInt.parse,
+        );
+      });
+
+      test('sequence', () async {
+        var mt = mtfn.MersenneTwister.from(sequence);
+        await _compareReferenceOutput(
+          () => BigInt.from(mt()),
+          'reference/mt19937/sequence.txt',
           BigInt.parse,
         );
       });
@@ -95,6 +116,18 @@ Future<void> main() async {
           BigInt.parse,
         );
       });
+
+      test('sequence', () async {
+        var mt = MersenneTwisterEngine.w32()
+          ..initFromSequence(
+            sequence.map(Int64.new).toList(),
+          );
+        await _compareReferenceOutput(
+          mt.call,
+          'reference/mt19937/sequence.txt',
+          BigInt.parse,
+        );
+      });
     });
 
     group('mt19937-64:', () {
@@ -113,6 +146,18 @@ Future<void> main() async {
         await _compareReferenceOutput(
           mt.call,
           'reference/mt19937-64/max_seed.txt',
+          BigInt.parse,
+        );
+      });
+
+      test('sequence', () async {
+        var mt = MersenneTwisterEngine.w64()
+          ..initFromSequence(
+            sequence64.map(Int64.new).toList(),
+          );
+        await _compareReferenceOutput(
+          mt.call,
+          'reference/mt19937-64/sequence.txt',
           BigInt.parse,
         );
       });
