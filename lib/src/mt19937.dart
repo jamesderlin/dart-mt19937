@@ -32,84 +32,86 @@
 
 import 'dart:typed_data';
 
+import 'unsigned.dart';
+
 /// An implementation of Mersenne Twister 19937.
 ///
 /// This implementation should be used only for the Dart VM, not for Dart for
 /// the Web.
 class MersenneTwister {
   /// Word size.
-  static const w = 32;
+  static const _w = 32;
 
-  /// Mask for [w] bits.
-  static const _wordMask = (1 << w) - 1;
+  /// Mask for [_w] bits.
+  static const _wordMask = (1 << _w) - 1;
 
   /// The maximum value that returnable by [call()].
   static const max = _wordMask;
 
   /// Separation point of a word (the "twist value").
-  static const r = 31;
+  static const _r = 31;
 
   /// Least-significant `r` bits.
-  static const _lowerMask = (1 << r) - 1;
+  static const _lowerMask = (1 << _r) - 1;
 
   /// Most significant `w - r` bits.
   static const _upperMask = _wordMask & ~_lowerMask;
 
   /// Degree of recurrence.
-  static const n = 624;
+  static const _n = 624;
 
   /// Recurrence offset.
-  static const m = 397;
+  static const _m = 397;
 
   /// Coefficients of the rational normal form twist matrix.
-  static const a = 0x9908B0DF;
+  static const _a = 0x9908B0DF;
 
   /// Tempering right shift amount.
-  static const u = 11;
+  static const _u = 11;
 
   /// Tempering mask.
-  static const d = 0xFFFFFFFF;
+  static const _d = 0xFFFFFFFF;
 
   /// Tempering left shift amount.
-  static const s = 7;
+  static const _s = 7;
 
   /// Tempering mask.
-  static const b = 0x9D2C5680;
+  static const _b = 0x9D2C5680;
 
   /// Tempering left shift amount.
-  static const t = 15;
+  static const _t = 15;
 
   /// Tempering mask.
-  static const c = 0xEFC60000;
+  static const _c = 0xEFC60000;
 
   /// Tempering right shift amount.
-  static const l = 18;
+  static const _l = 18;
 
   /// Initialization multiplier.
-  static const f = 1812433253;
+  static const _f = 1812433253;
 
   /// Initialization multiplier when seeding from a sequence.
-  static const f1 = 1664525;
+  static const _f1 = 1664525;
 
   /// Initialization multiplier when seeding from a sequence.
-  static const f2 = 1566083941;
+  static const _f2 = 1566083941;
 
   static const defaultSeed = 5489;
 
   static const _sequenceInitialSeed = 19650218;
 
   /// The state vector.
-  final _state = Uint32List(n);
-  int _stateIndex = n;
+  final _state = Uint32List(_n);
+  int _stateIndex = _n;
 
   /// Initializes the random number generator from an optional seed.
   MersenneTwister({int seed = defaultSeed}) {
     _state[0] = seed & _wordMask;
-    for (_stateIndex = 1; _stateIndex < n; _stateIndex += 1) {
+    for (_stateIndex = 1; _stateIndex < _n; _stateIndex += 1) {
       // See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier.
-      _state[_stateIndex] = f *
+      _state[_stateIndex] = _f *
               (_state[_stateIndex - 1] ^
-                  (_state[_stateIndex - 1] >>> (w - 2))) +
+                  (_state[_stateIndex - 1] >>> (_w - 2))) +
           _stateIndex;
       _state[_stateIndex] &= _wordMask;
     }
@@ -120,58 +122,54 @@ class MersenneTwister {
     var mt = MersenneTwister(seed: _sequenceInitialSeed);
     var i = 1;
     var j = 0;
-    for (var k = n > key.length ? n : key.length; k != 0; k -= 1) {
+    for (var k = _n > key.length ? _n : key.length; k != 0; k -= 1) {
       mt._state[i] = (mt._state[i] ^
-              ((mt._state[i - 1] ^ (mt._state[i - 1] >>> (w - 2))) * f1)) +
+              ((mt._state[i - 1] ^ (mt._state[i - 1] >>> (_w - 2))) * _f1)) +
           key[j] +
           j; // Non-linear.
       mt._state[i] &= _wordMask;
       i += 1;
       j += 1;
-      if (i >= n) {
-        mt._state[0] = mt._state[n - 1];
+      if (i >= _n) {
+        mt._state[0] = mt._state[_n - 1];
         i = 1;
       }
       if (j >= key.length) {
         j = 0;
       }
     }
-    for (var k = n - 1; k != 0; k -= 1) {
+    for (var k = _n - 1; k != 0; k -= 1) {
       mt._state[i] = (mt._state[i] ^
-              ((mt._state[i - 1] ^ (mt._state[i - 1] >>> (w - 2))) * f2)) -
+              ((mt._state[i - 1] ^ (mt._state[i - 1] >>> (_w - 2))) * _f2)) -
           i; // Non-linear.
       mt._state[i] &= _wordMask;
       i += 1;
-      if (i >= n) {
-        mt._state[0] = mt._state[n - 1];
+      if (i >= _n) {
+        mt._state[0] = mt._state[_n - 1];
         i = 1;
       }
     }
 
     // MSB is 1; assuring non-zero initial array.
-    mt._state[0] = 1 << (w - 1);
+    mt._state[0] = 1 << (_w - 1);
     return mt;
   }
 
-  /// Returns the next random number.
-  ///
-  /// Note this potentially returns a signed integer that is potentially
-  /// negative.  To match values from Mersenne Twister implementations that
-  /// operate over unsigned integers, call [int.toUint32] on the result.
+  /// Returns the next random number in the range [0, max].
   int call() {
     // Generate [n] words at one time.
-    if (_stateIndex == n) {
+    if (_stateIndex == _n) {
       int i;
-      for (i = 0; i < n - m; i += 1) {
+      for (i = 0; i < _n - _m; i += 1) {
         var x = (_state[i] & _upperMask) | (_state[i + 1] & _lowerMask);
-        _state[i] = _state[i + m] ^ (x >>> 1) ^ ((x & 0x1) * a);
+        _state[i] = _state[i + _m] ^ (x >>> 1) ^ ((x & 0x1) * _a);
       }
-      for (; i < n - 1; i += 1) {
+      for (; i < _n - 1; i += 1) {
         var x = (_state[i] & _upperMask) | (_state[i + 1] & _lowerMask);
-        _state[i] = _state[i + m - n] ^ (x >>> 1) ^ ((x & 0x1) * a);
+        _state[i] = _state[i + _m - _n] ^ (x >>> 1) ^ ((x & 0x1) * _a);
       }
-      var x = (_state[n - 1] & _upperMask) | (_state[0] & _lowerMask);
-      _state[n - 1] = _state[m - 1] ^ (x >>> 1) ^ ((x & 0x1) * a);
+      var x = (_state[_n - 1] & _upperMask) | (_state[0] & _lowerMask);
+      _state[_n - 1] = _state[_m - 1] ^ (x >>> 1) ^ ((x & 0x1) * _a);
 
       _stateIndex = 0;
     }
@@ -180,23 +178,10 @@ class MersenneTwister {
     _stateIndex += 1;
 
     // Tempering.
-    x ^= (x >>> u) & d;
-    x ^= (x << s) & b;
-    x ^= (x << t) & c;
-    x ^= x >>> l;
-    return x;
-  }
-}
-
-extension UnsignedInt on int {
-  /// Returns the unsigned 32-bit integer that corresponds to this [int]'s
-  /// two's-complement bit representation.
-  int toUint32() {
-    // Fail if compiled to JavaScript.
-    assert(
-      (1 << 32) != 0,
-      'int type must support bitwise operations of more than 32 bits.',
-    );
-    return this >= 0 ? this : (1 << 32 + this);
+    x ^= (x >>> _u) & _d;
+    x ^= (x << _s) & _b;
+    x ^= (x << _t) & _c;
+    x ^= x >>> _l;
+    return x.toUint32();
   }
 }

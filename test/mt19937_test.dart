@@ -36,7 +36,7 @@ Future<void> main() async {
       test('default seed', () async {
         var mt = MersenneTwister();
         await _compareReferenceOutput(
-          () => BigInt.from(mt().toUint32()),
+          () => BigInt.from(mt()),
           'reference/expected_mt19937_default.txt',
           BigInt.parse,
         );
@@ -46,7 +46,7 @@ Future<void> main() async {
         var seed = (1 << 32) - 1;
         var mt = MersenneTwister(seed: seed);
         await _compareReferenceOutput(
-          () => BigInt.from(mt().toUint32()),
+          () => BigInt.from(mt()),
           'reference/expected_mt19937_max_seed.txt',
           BigInt.parse,
         );
@@ -57,17 +57,17 @@ Future<void> main() async {
       test('default seed', () async {
         var mt = mtfn.MersenneTwister();
         await _compareReferenceOutput(
-          () => mt().toUnsignedBigInt(),
+          () => BigInt.from(mt()),
           'reference/expected_mt19937_default.txt',
           BigInt.parse,
         );
       });
 
       test('max seed', () async {
-        var seed = Int32(-1);
+        var seed = -1;
         var mt = mtfn.MersenneTwister(seed: seed);
         await _compareReferenceOutput(
-          () => mt().toUnsignedBigInt(),
+          () => BigInt.from(mt()),
           'reference/expected_mt19937_max_seed.txt',
           BigInt.parse,
         );
@@ -80,7 +80,7 @@ Future<void> main() async {
       test('default seed', () async {
         var mt = MersenneTwisterEngine.w32();
         await _compareReferenceOutput(
-          () => mt().toUnsignedBigInt(),
+          mt.call,
           'reference/expected_mt19937_default.txt',
           BigInt.parse,
         );
@@ -90,7 +90,7 @@ Future<void> main() async {
         var seed = Int64((1 << 32) - 1);
         var mt = MersenneTwisterEngine.w32()..init(seed.toInt64());
         await _compareReferenceOutput(
-          () => mt().toUnsignedBigInt(),
+          mt.call,
           'reference/expected_mt19937_max_seed.txt',
           BigInt.parse,
         );
@@ -101,7 +101,7 @@ Future<void> main() async {
       test('default seed', () async {
         var mt = MersenneTwisterEngine.w64();
         await _compareReferenceOutput(
-          () => mt().toUnsignedBigInt(),
+          mt.call,
           'reference/expected_mt19937_64_default.txt',
           BigInt.parse,
         );
@@ -111,14 +111,13 @@ Future<void> main() async {
         var seed = Int64(-1);
         var mt = MersenneTwisterEngine.w64()..init(seed);
         await _compareReferenceOutput(
-          () => mt().toUnsignedBigInt(),
+          mt.call,
           'reference/expected_mt19937_64_max_seed.txt',
           BigInt.parse,
         );
       });
     });
   });
-
 }
 
 Future<void> _compareReferenceOutput<T>(

@@ -34,6 +34,8 @@
 
 import 'package:fixnum/fixnum.dart';
 
+import 'unsigned.dart';
+
 /// A configurable implementation of the Mersenne Twister.
 ///
 /// This implementation is portable for both the Dart VM and for Dart for the
@@ -167,7 +169,7 @@ class MersenneTwisterEngine {
 
   /// Initializes the [MersenneTwisterEngine] from a seed.
   void init(Int64 seed) {
-    _state[0] = seed;
+    _state[0] = seed & _wordMask;
     for (_stateIndex = 1; _stateIndex < n; _stateIndex += 1) {
       // See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier.
       _state[_stateIndex] = f *
@@ -218,13 +220,19 @@ class MersenneTwisterEngine {
     _state[0] = Int64.ONE << (w - 1);
   }
 
+  /// Returns the next random number in the range [0, max].
+  ///
+  /// For callers that don't care about signed values and care only about the
+  /// random bit representation , calling [nextInt64] instead would be slightly
+  /// faster.
+  BigInt call() => nextInt64().toUnsignedBigInt();
+
   /// Returns the next random number.
   ///
   /// Note this potentially returns a signed integer that is potentially
   /// negative.  To match values from Mersenne Twister implementations that
-  /// operate over unsigned integers, call [UnsignedInt64.toUnsignedBigInt] on
-  /// the result.
-  Int64 call() {
+  /// operate over unsigned integers, use [call()] instead.
+  Int64 nextInt64() {
     // Generate [n] words at one time.
     if (_stateIndex >= n) {
       if (_stateIndex == n + 1) {
@@ -260,10 +268,4 @@ class MersenneTwisterEngine {
     x ^= x.shiftRightUnsigned(l);
     return x;
   }
-}
-
-extension UnsignedInt64 on Int64 {
-  /// Returns the unsigned 64-bit integer that corresponds to this [Int64]'s
-  /// two's-complement bit representation.
-  BigInt toUnsignedBigInt() => BigInt.parse(toStringUnsigned());
 }
