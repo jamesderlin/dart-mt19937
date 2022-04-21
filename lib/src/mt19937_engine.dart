@@ -32,22 +32,27 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-/// An implementation of Mersenne Twister 19937-64.
+import 'package:fixnum/fixnum.dart';
+
+/// A configurable implementation of the Mersenne Twister.
+///
+/// This implementation is portable for both the Dart VM and for Dart for the
+/// Web.
 class MersenneTwisterEngine {
   /// Word size.
   final int w;
 
   /// Mask for [w] bits.
-  late final _wordMask = (BigInt.one << w) - BigInt.one;
+  late final _wordMask = (Int64.ONE << w) - Int64.ONE;
 
   /// The maximum value that returnable by [call()].
-  late final max = _wordMask;
+  late final max = _wordMask.toUnsignedBigInt();
 
   /// Separation point of a word (the "twist value").
   final int r;
 
   /// Least-significant `r` bits.
-  late final _lowerMask = (BigInt.one << r) - BigInt.one;
+  late final _lowerMask = (Int64.ONE << r) - Int64.ONE;
 
   /// Most significant `w - r` bits.
   late final _upperMask = _wordMask & ~_lowerMask;
@@ -59,44 +64,44 @@ class MersenneTwisterEngine {
   final int m;
 
   /// Coefficients of the rational normal form twist matrix.
-  final BigInt a;
+  final Int64 a;
 
   /// Tempering right shift amount.
   final int u;
 
   /// Tempering mask.
-  final BigInt d;
+  final Int64 d;
 
   /// Tempering left shift amount.
   final int s;
 
   /// Tempering mask.
-  final BigInt b;
+  final Int64 b;
 
   /// Tempering left shift amount.
   final int t;
 
   /// Tempering mask.
-  final BigInt c;
+  final Int64 c;
 
   /// Tempering right shift amount.
   final int l;
 
   /// Initialization multiplier.
-  final BigInt f;
+  final Int64 f;
 
   /// Initialization multiplier when seeding from a sequence.
-  final BigInt f1;
+  final Int64 f1;
 
   /// Initialization multiplier when seeding from a sequence.
-  final BigInt f2;
+  final Int64 f2;
 
   static const defaultSeed = 5489;
 
   static const _sequenceInitialSeed = 19650218;
 
   /// The state vector.
-  late final _state = List<BigInt>.filled(n, BigInt.zero);
+  late final _state = List<Int64>.filled(n, Int64.ZERO);
 
   // `n + 1` is a sentinel value to indicate that `_state` is not initialized.
   late int _stateIndex = n + 1;
@@ -127,17 +132,17 @@ class MersenneTwisterEngine {
           r: 31,
           n: 624,
           m: 397,
-          a: BigInt.from(0x9908B0DF),
+          a: Int64(0x9908B0DF),
           u: 11,
-          d: BigInt.from(0xFFFFFFFF),
+          d: Int64(0xFFFFFFFF),
           s: 7,
-          b: BigInt.from(0x9D2C5680),
+          b: Int64(0x9D2C5680),
           t: 15,
-          c: BigInt.from(0xEFC60000),
+          c: Int64(0xEFC60000),
           l: 18,
-          f: BigInt.from(1812433253),
-          f1: BigInt.from(1664525),
-          f2: BigInt.from(1566083941),
+          f: Int64(1812433253),
+          f1: Int64(1664525),
+          f2: Int64(1566083941),
         );
 
   // Constructs an MT19937-64 generator.
@@ -147,44 +152,44 @@ class MersenneTwisterEngine {
           r: 31,
           n: 312,
           m: 156,
-          a: BigInt.parse('0xB5026F5AA96619E9'),
+          a: Int64.parseHex('B5026F5AA96619E9'),
           u: 29,
-          d: BigInt.parse('0x5555555555555555'),
+          d: Int64.parseHex('5555555555555555'),
           s: 17,
-          b: BigInt.parse('0x71D67FFFEDA60000'),
+          b: Int64.parseHex('71D67FFFEDA60000'),
           t: 37,
-          c: BigInt.parse('0xFFF7EEE000000000'),
+          c: Int64.parseHex('FFF7EEE000000000'),
           l: 43,
-          f: BigInt.parse('6364136223846793005'),
-          f1: BigInt.parse('3935559000370003845'),
-          f2: BigInt.parse('2862933555777941757'),
+          f: Int64.parseInt('6364136223846793005'),
+          f1: Int64.parseInt('3935559000370003845'),
+          f2: Int64.parseInt('2862933555777941757'),
         );
 
   /// Initializes the [MersenneTwisterEngine] from a seed.
-  void init(BigInt seed) {
+  void init(Int64 seed) {
     _state[0] = seed;
     for (_stateIndex = 1; _stateIndex < n; _stateIndex += 1) {
       // See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier.
-      // In the previous versions, MSBs of the seed affect
-      // only MSBs of the array mt[].
-      _state[_stateIndex] =
-          f * (_state[_stateIndex - 1] ^ (_state[_stateIndex - 1] >> (w - 2))) +
-              BigInt.from(_stateIndex);
+      _state[_stateIndex] = f *
+              (_state[_stateIndex - 1] ^
+                  (_state[_stateIndex - 1].shiftRightUnsigned(w - 2))) +
+          Int64(_stateIndex);
       _state[_stateIndex] &= _wordMask;
     }
   }
 
   /// Initializes the [MersenneTwisterEngine] from a sequence.
-  void initFromSequence(List<BigInt> key) {
-    init(BigInt.from(_sequenceInitialSeed));
+  void initFromSequence(List<Int64> key) {
+    init(Int64(_sequenceInitialSeed));
 
     var i = 1;
     var j = 0;
     for (var k = n > key.length ? n : key.length; k != 0; k -= 1) {
-      _state[i] =
-          (_state[i] ^ ((_state[i - 1] ^ (_state[i - 1] >> (w - 2))) * f1)) +
-              key[j] +
-              BigInt.from(j); // Non-linear.
+      _state[i] = (_state[i] ^
+              ((_state[i - 1] ^ (_state[i - 1].shiftRightUnsigned(w - 2))) *
+                  f1)) +
+          key[j] +
+          Int64(j); // Non-linear.
       _state[i] &= _wordMask;
       i += 1;
       j += 1;
@@ -197,9 +202,10 @@ class MersenneTwisterEngine {
       }
     }
     for (var k = n - 1; k != 0; k -= 1) {
-      _state[i] =
-          (_state[i] ^ ((_state[i - 1] ^ (_state[i - 1] >> (w - 2))) * f2)) -
-              BigInt.from(i); // Non-linear.
+      _state[i] = (_state[i] ^
+              ((_state[i - 1] ^ (_state[i - 1].shiftRightUnsigned(w - 2))) *
+                  f2)) -
+          Int64(i); // Non-linear.
       _state[i] &= _wordMask;
       i += 1;
       if (i >= n) {
@@ -209,28 +215,37 @@ class MersenneTwisterEngine {
     }
 
     // MSB is 1; assuring non-zero initial array.
-    _state[0] = BigInt.one << (w - 1);
+    _state[0] = Int64.ONE << (w - 1);
   }
 
   /// Returns the next random number.
-  BigInt call() {
+  ///
+  /// Note this potentially returns a signed integer that is potentially
+  /// negative.  To match values from Mersenne Twister implementations that
+  /// operate over unsigned integers, call [UnsignedInt64.toUnsignedBigInt] on
+  /// the result.
+  Int64 call() {
     // Generate [n] words at one time.
     if (_stateIndex >= n) {
       if (_stateIndex == n + 1) {
-        init(BigInt.from(defaultSeed));
+        init(Int64(defaultSeed));
       }
 
       int i;
       for (i = 0; i < n - m; i += 1) {
         var x = (_state[i] & _upperMask) | (_state[i + 1] & _lowerMask);
-        _state[i] = _state[i + m] ^ (x >> 1) ^ ((x & BigInt.one) * a);
+        _state[i] =
+            _state[i + m] ^ (x.shiftRightUnsigned(1)) ^ ((x & Int64.ONE) * a);
       }
       for (; i < n - 1; i += 1) {
         var x = (_state[i] & _upperMask) | (_state[i + 1] & _lowerMask);
-        _state[i] = _state[i + m - n] ^ (x >> 1) ^ ((x & BigInt.one) * a);
+        _state[i] = _state[i + m - n] ^
+            (x.shiftRightUnsigned(1)) ^
+            ((x & Int64.ONE) * a);
       }
       var x = (_state[n - 1] & _upperMask) | (_state[0] & _lowerMask);
-      _state[n - 1] = _state[m - 1] ^ (x >> 1) ^ ((x & BigInt.one) * a);
+      _state[n - 1] =
+          _state[m - 1] ^ (x.shiftRightUnsigned(1)) ^ ((x & Int64.ONE) * a);
 
       _stateIndex = 0;
     }
@@ -239,10 +254,16 @@ class MersenneTwisterEngine {
     _stateIndex += 1;
 
     // Tempering.
-    x ^= (x >> u) & d;
+    x ^= (x.shiftRightUnsigned(u)) & d;
     x ^= (x << s) & b;
     x ^= (x << t) & c;
-    x ^= x >> l;
+    x ^= x.shiftRightUnsigned(l);
     return x;
   }
+}
+
+extension UnsignedInt64 on Int64 {
+  /// Returns the unsigned 64-bit integer that corresponds to this [Int64]'s
+  /// two's-complement bit representation.
+  BigInt toUnsignedBigInt() => BigInt.parse(toStringUnsigned());
 }

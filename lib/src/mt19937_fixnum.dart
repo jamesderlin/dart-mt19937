@@ -33,6 +33,9 @@
 import 'package:fixnum/fixnum.dart';
 
 /// An implementation of Mersenne Twister 19937.
+///
+/// This implementation is portable for both the Dart VM and for Dart for the
+/// Web.
 class MersenneTwister {
   /// Word size.
   static const w = 32;
@@ -47,7 +50,7 @@ class MersenneTwister {
   static const r = 31;
 
   /// Least-significant `r` bits.
-  static final _lowerMask = ((Int32.ONE << r) - Int32.ONE) as Int32;
+  static final _lowerMask = (Int32.ONE << r) - Int32.ONE as Int32;
 
   /// Most significant `w - r` bits.
   static final _upperMask = _wordMask & ~_lowerMask;
@@ -155,6 +158,11 @@ class MersenneTwister {
   }
 
   /// Returns the next random number.
+  ///
+  /// Note this potentially returns a signed integer that is potentially
+  /// negative.  To match values from Mersenne Twister implementations that
+  /// operate over unsigned integers, call [UnsignedInt32.toUnsignedBigInt] on
+  /// the result.
   Int32 call() {
     // Generate [n] words at one time.
     if (_stateIndex == n) {
@@ -186,32 +194,11 @@ class MersenneTwister {
   }
 }
 
-
-extension on int {
-  /// Returns the [BigInt] for the 64-bit unsigned integer corresponding to this
-  /// [int]'s bit representation.
+extension UnsignedInt32 on Int32 {
+  /// Returns the unsigned 32-bit integer that corresponds to this [Int32]'s
+  /// two's-complement bit representation.
   BigInt toUnsignedBigInt() {
-    var bigInt = BigInt.from(this);
-    return (bigInt.isNegative) ? ((BigInt.one << 32) + bigInt) : bigInt;
+    var bigInt = BigInt.parse(toString());
+    return bigInt.isNegative ? ((BigInt.one << 32) + bigInt) : bigInt;
   }
-}
-
-extension on BigInt {
-  /// Returns the [int] for the signed integer corresponding to this [BigInt]'s
-  /// 64-bit unsigned integer representation.
-  int toSignedInt64() =>
-      ((this < BigInt.one << 31) ? this : (this - (BigInt.one << 32))).toInt();
-}
-
-void main() {
-  // var mt = MersenneTwister();
-  // for (var i = 1; i < 10000; i += 1) {
-  //   mt();
-  // }
-  // var x = mt();
-  // print(x.toInt().toUnsignedBigInt());
-  var x = Int32(-1);
-  print(x);
-  print(x.toInt().toUnsignedBigInt());
-  print(x.toUnsigned(31));
 }

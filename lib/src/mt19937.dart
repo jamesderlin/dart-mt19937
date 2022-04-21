@@ -33,6 +33,9 @@
 import 'dart:typed_data';
 
 /// An implementation of Mersenne Twister 19937.
+///
+/// This implementation should be used only for the Dart VM, not for Dart for
+/// the Web.
 class MersenneTwister {
   /// Word size.
   static const w = 32;
@@ -151,6 +154,10 @@ class MersenneTwister {
   }
 
   /// Returns the next random number.
+  ///
+  /// Note this potentially returns a signed integer that is potentially
+  /// negative.  To match values from Mersenne Twister implementations that
+  /// operate over unsigned integers, call [int.toUint32] on the result.
   int call() {
     // Generate [n] words at one time.
     if (_stateIndex == n) {
@@ -178,5 +185,18 @@ class MersenneTwister {
     x ^= (x << t) & c;
     x ^= x >>> l;
     return x;
+  }
+}
+
+extension UnsignedInt on int {
+  /// Returns the unsigned 32-bit integer that corresponds to this [int]'s
+  /// two's-complement bit representation.
+  int toUint32() {
+    // Fail if compiled to JavaScript.
+    assert(
+      (1 << 32) != 0,
+      'int type must support bitwise operations of more than 32 bits.',
+    );
+    return this >= 0 ? this : (1 << 32 + this);
   }
 }
