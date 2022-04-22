@@ -47,7 +47,7 @@ class MersenneTwisterEngine {
   /// Mask for [w] bits.
   late final _wordMask = (Int64.ONE << w) - Int64.ONE;
 
-  /// The maximum value that returnable by [call()].
+  /// The maximum value returnable by [call()].
   late final max = _wordMask.toUnsignedBigInt();
 
   /// Separation point of a word (the "twist value").
@@ -220,9 +220,11 @@ class MersenneTwisterEngine {
 
   /// Returns the next random number in the range [0, max].
   ///
-  /// For callers that don't care about signed values and care only about the
-  /// random bit representation , calling [nextInt64] instead would be slightly
-  /// faster.
+  /// This returns a [BigInt] instead of an [Int64] to guarantee that all
+  /// results will be non-negative.
+  ///
+  /// Callers that don't care about the sign of the result and care only about
+  /// the random bits can call [nextInt64] instead, which is faster.
   BigInt call() => nextInt64().toUnsignedBigInt();
 
   /// Returns the next random number.

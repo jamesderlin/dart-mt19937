@@ -45,7 +45,7 @@ class MersenneTwister {
   /// Mask for [_w] bits.
   static final _wordMask = Int32(max);
 
-  /// The maximum value that returnable by [call()].
+  /// The maximum value returnable by [call()].
   static const max = 0xFFFFFFFF;
 
   /// Separation point of a word (the "twist value").

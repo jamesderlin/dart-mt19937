@@ -48,7 +48,7 @@ class MersenneTwister implements base.MersenneTwister {
   /// Mask for [_w] bits.
   static const _wordMask = (1 << _w) - 1;
 
-  /// The maximum value that returnable by [call()].
+  /// The maximum value returnable by [call()].
   static const max = _wordMask;
 
   /// Separation point of a word (the "twist value").
