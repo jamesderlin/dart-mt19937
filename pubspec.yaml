@@ -12,4 +12,27 @@ dependencies:
 dev_dependencies:
   build_runner: ^2.1.4
   build_web_compilers: ^3.2.1
+  resource_importer: ^0.1.0
   test: ^1.16.0
+
+resource_importer:
+  destination: 'test/reference.resources.dart'
+  resources:
+    defaultSeedResults:
+      path: reference/mt19937/default.txt
+      type: List<String>
+    maxSeedResults:
+      path: reference/mt19937/max_seed.txt
+      type: List<String>
+    sequenceResults:
+      path: reference/mt19937/sequence.txt
+      type: List<String>
+    defaultSeed64Results:
+      path: reference/mt19937-64/default.txt
+      type: List<String>
+    maxSeed64Results:
+      path: reference/mt19937-64/max_seed.txt
+      type: List<String>
+    sequence64Results:
+      path: reference/mt19937-64/sequence.txt
+      type: List<String>
