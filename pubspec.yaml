@@ -27,6 +27,9 @@ resource_importer:
     sequenceResults:
       path: reference/mt19937/sequence.txt
       type: List<String>
+    defaultDoubleResults:
+      path: reference/mt19937/double.txt
+      type: List<String>
     defaultSeed64Results:
       path: reference/mt19937-64/default.txt
       type: List<String>
@@ -35,4 +38,7 @@ resource_importer:
       type: List<String>
     sequence64Results:
       path: reference/mt19937-64/sequence.txt
+      type: List<String>
+    defaultDouble64Results:
+      path: reference/mt19937-64/double.txt
       type: List<String>

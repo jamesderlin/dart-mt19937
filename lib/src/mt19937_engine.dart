@@ -32,6 +32,7 @@
 // NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import 'dart:math' as math;
 import 'package:fixnum/fixnum.dart';
 
 import 'unsigned.dart';
@@ -229,8 +230,8 @@ class MersenneTwisterEngine {
 
   /// Returns the next random number.
   ///
-  /// Note this potentially returns a signed integer that is potentially
-  /// negative.  To match values from Mersenne Twister implementations that
+  /// Note that this returns a signed integer that is potentially negative if
+  /// [w] is 64.  To match values from Mersenne Twister implementations that
   /// operate over unsigned integers, use [call()] instead.
   Int64 nextInt64() {
     // Generate [n] words at one time.
@@ -263,5 +264,28 @@ class MersenneTwisterEngine {
     x ^= (x << t) & c;
     x ^= x >>> l;
     return x;
+  }
+
+  /// Returns the exclusive maximum integer value returnable as a [double].
+  late final _maxDouble = math.pow(2.0, math.min(w, 53)).toDouble();
+
+  /// Returns the next random number as a [double].
+  Int64 _randInt53() => nextInt64() >>> (math.max(0, w - 53));
+
+  /// Returns the next random [double] in the closed interval \[0, 1\].
+  double genRandReal1() => _randInt53().toDouble() * (1.0 / (_maxDouble - 1));
+
+  /// Returns the next random [double] in the half-open interval \[0, 1).
+  double genRandReal2() => _randInt53().toDouble() * (1.0 / _maxDouble);
+
+  /// Returns the next random [double] in the open interval (0, 1).
+  double genRandReal3() {
+    var random = _randInt53();
+    var maxDouble = _maxDouble;
+    if (w >= 53) {
+      random >>>= 1;
+      maxDouble /= 2;
+    }
+    return (random.toDouble() + 0.5) * (1.0 / maxDouble);
   }
 }

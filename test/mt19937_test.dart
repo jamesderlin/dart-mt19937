@@ -47,6 +47,19 @@ Future<void> main() async {
             BigInt.parse,
           );
         });
+
+        test('double', () {
+          var mt = MersenneTwister();
+          _compareReferenceOutput(
+            NextElementFrom([
+              mt.genRandReal1(),
+              mt.genRandReal2(),
+              mt.genRandReal3(),
+            ]),
+            resources.defaultDoubleResults,
+            double.parse,
+          );
+        });
       },
       testOn: 'vm',
     );
@@ -77,6 +90,19 @@ Future<void> main() async {
           () => BigInt.from(mt()),
           resources.sequenceResults,
           BigInt.parse,
+        );
+      });
+
+      test('double', () {
+        var mt = mtfn.MersenneTwister();
+        _compareReferenceOutput(
+          NextElementFrom([
+            mt.genRandReal1(),
+            mt.genRandReal2(),
+            mt.genRandReal3(),
+          ]),
+          resources.defaultDoubleResults,
+          double.parse,
         );
       });
     });
@@ -114,6 +140,19 @@ Future<void> main() async {
           BigInt.parse,
         );
       });
+
+      test('double', () {
+        var mt = MersenneTwisterEngine.w32();
+        _compareReferenceOutput(
+          NextElementFrom([
+            mt.genRandReal1(),
+            mt.genRandReal2(),
+            mt.genRandReal3(),
+          ]),
+          resources.defaultDoubleResults,
+          double.parse,
+        );
+      });
     });
 
     group('mt19937-64:', () {
@@ -147,10 +186,25 @@ Future<void> main() async {
           BigInt.parse,
         );
       });
+
+      test('double', () {
+        var mt = MersenneTwisterEngine.w64();
+        _compareReferenceOutput(
+          NextElementFrom([
+            mt.genRandReal1(),
+            mt.genRandReal2(),
+            mt.genRandReal3(),
+          ]),
+          resources.defaultDouble64Results,
+          double.parse,
+        );
+      });
     });
   });
 }
 
+/// Verifies that the output from [generator] matches the parsed values from
+/// [expectedValues].
 void _compareReferenceOutput<T>(
   T Function() generator,
   List<String> expectedValues,
@@ -161,5 +215,22 @@ void _compareReferenceOutput<T>(
     var actualValue = generator();
     expect(actualValue, expectedValue, reason: 'iteration: $i');
     i += 1;
+  }
+}
+
+/// A class whose [call] method returns the next element from a specified
+/// [Iterable].
+class NextElementFrom<E> {
+  final Iterator<E> _iterator;
+
+  /// Constructor.
+  NextElementFrom(Iterable<E> iterable) : _iterator = iterable.iterator;
+
+  /// Returns the next element from the iterable.
+  E call() {
+    if (!_iterator.moveNext()) {
+      throw RangeError('Iterated past the end');
+    }
+    return _iterator.current;
   }
 }

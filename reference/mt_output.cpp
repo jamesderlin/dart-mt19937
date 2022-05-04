@@ -57,5 +57,23 @@ int main() {
   init_by_array64(init64, length(init64));
   generate_output(mt19937_root, mt19937_64_root, "sequence.txt");
 
+  init_genrand(5489);
+  init_genrand64(5489);
+
+  constexpr auto openMode = std::ofstream::out | std::ofstream::trunc;
+  constexpr auto maxPrecision = std::numeric_limits<double>::max_digits10;
+
+  auto output32 = std::ofstream(mt19937_root / "double.txt", openMode);
+  output32.precision(maxPrecision);
+  output32 << genrand_real1() << "\n"
+           << genrand_real2() << "\n"
+           << genrand_real3() << "\n";
+
+  auto output64 = std::ofstream(mt19937_64_root / "double.txt", openMode);
+  output64.precision(maxPrecision);
+  output64 << genrand64_real1() << "\n"
+           << genrand64_real2() << "\n"
+           << genrand64_real3() << "\n";
+
   return 0;
 }

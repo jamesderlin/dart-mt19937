@@ -1,5 +1,3 @@
-// ignore_for_file: public_member_api_docs
-
 // Original implementation copyright (C) 1997 - 2002, Makoto Matsumoto and
 // Takuji Nishimura.  All rights reserved.
 //
@@ -96,6 +94,7 @@ class MersenneTwister {
   /// Initialization multiplier when seeding from a sequence.
   static final _f2 = Int32(1566083941);
 
+  /// The default seed.
   static const defaultSeed = 5489;
 
   static const _sequenceInitialSeed = 19650218;
@@ -155,8 +154,11 @@ class MersenneTwister {
     return mt;
   }
 
+  /// An alias to [genRandInt32].
+  int call() => genRandInt32();
+
   /// Returns the next random number in the range [0, max].
-  int call() {
+  int genRandInt32() {
     // Generate [n] words at one time.
     if (_stateIndex == _n) {
       int i;
@@ -183,5 +185,25 @@ class MersenneTwister {
     x ^= (x << _t) & _c;
     x ^= x >>> _l;
     return x.toInt().toUnsigned(32);
+  }
+
+  /// Returns the next random integer in the range \[0, (1 << 31) - 1)\].
+  int genRandInt31() => genRandInt32() >>> 1;
+
+  /// Returns the next random [double] in the closed interval \[0, 1\].
+  double genRandReal1() => genRandInt32() * (1.0 / 4294967295.0);
+
+  /// Returns the next random [double] in the half-open interval \[0, 1).
+  double genRandReal2() => genRandInt32() * (1.0 / 4294967296.0);
+
+  /// Returns the next random [double] in the open interval (0, 1).
+  double genRandReal3() => (genRandInt32() + 0.5) * (1.0 / 4294967296.0);
+
+  /// Returns a random [double] in the half-open interval \[0, 1) with 53-bit
+  /// resolution.
+  double genRandRes53() {
+    var a = genRandInt32() >>> 5;
+    var b = genRandInt32() >>> 6;
+    return (a * 67108864.0 + b) * (1.0 / 9007199254740992.0);
   }
 }

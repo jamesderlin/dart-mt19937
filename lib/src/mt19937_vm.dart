@@ -1,5 +1,3 @@
-// ignore_for_file: public_member_api_docs
-
 // Original implementation copyright (C) 1997 - 2002, Makoto Matsumoto and
 // Takuji Nishimura.  All rights reserved.
 //
@@ -41,7 +39,7 @@ import 'mt19937_fixnum.dart' as base;
 /// the Web.
 ///
 /// [1]: https://en.wikipedia.org/wiki/Mersenne_twister
-class MersenneTwister implements base.MersenneTwister {
+class MersenneTwister extends base.MersenneTwister {
   /// Word size.
   static const _w = 32;
 
@@ -99,6 +97,7 @@ class MersenneTwister implements base.MersenneTwister {
   /// Initialization multiplier when seeding from a sequence.
   static const _f2 = 1566083941;
 
+  /// The default seed.
   static const defaultSeed = 5489;
 
   static const _sequenceInitialSeed = 19650218;
@@ -158,9 +157,8 @@ class MersenneTwister implements base.MersenneTwister {
     return mt;
   }
 
-  /// Returns the next random number in the range [0, max].
   @override
-  int call() {
+  int genRandInt32() {
     // Generate [n] words at one time.
     if (_stateIndex == _n) {
       int i;
