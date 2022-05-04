@@ -2,6 +2,18 @@
 ///
 /// Tests may be run in the VM or in a web browser.
 ///
+/// Tests compare output against the expected results from the MT19937 and
+/// MT19937-64 reference implementations.  Running the tests requires first
+/// generating the reference output with Clang and GNU make.
+///
+/// ```
+/// # From the mt19937 package directory:
+/// $ cd reference
+/// $ make
+/// $ cd ..
+/// $ dart run resource_importer
+/// $ dart test
+/// ```
 /// Test on web browsers with: `dart test --platform={chrome,firefox}`
 
 import 'package:fixnum/fixnum.dart';

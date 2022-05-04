@@ -1,7 +1,6 @@
 # mt19937
 
-An implementation of the [Mersenne Twister 19937] pseudo-random number
-generator.
+Dart implementations of the [Mersenne Twister] pseudo-random number generator.
 
 Provides MT19937, MT19937-64, and configurable implementations for both native
 and web platforms.
@@ -10,5 +9,11 @@ and web platforms.
 
 See the [example].
 
-[Mersenne Twister 19937]: https://en.wikipedia.org/wiki/Mersenne_twister
+## Running tests
+
+See the instructions at the top of [`mt19937_test.dart`].
+
+
+[Mersenne Twister]: https://en.wikipedia.org/wiki/Mersenne_twister
 [example]: https://pub.dev/packages/mt19937/example
+[`mt19937_test.dart`]: https://github.com/jamesderlin/dart-mt19937/blob/master/test/mt19937_test.dart

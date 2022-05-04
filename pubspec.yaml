@@ -1,5 +1,5 @@
 name: mt19937
-description: Mersenne Twister implementations (MT19937 and MT19937-64).
+description: Dart implementations of the Mersenne Twister pseudo-random number generator.
 version: 0.1.0
 repository: https://github.com/jamesderlin/dart_mt19937
 
